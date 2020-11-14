@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
+    <PackageReference Include="System.ServiceModel.Syndication" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\KhaoSat.Data\KhaoSat.Data.csproj" />
+    <ProjectReference Include="..\KhaoSat.DependencyInjection\KhaoSat.DependencyInjection.csproj" />
+    <ProjectReference Include="..\KhaoSat.Manager\KhaoSat.Manager.csproj" />
+    <ProjectReference Include="..\KhaoSat.Models\KhaoSat.Models.csproj" />
+    <ProjectReference Include="..\KhaoSat.Repository\KhaoSat.Repository.csproj" />
+    <ProjectReference Include="..\KhaoSat.Utils\KhaoSat.Utils.csproj" />
+  </ItemGroup>
+
+</Project>

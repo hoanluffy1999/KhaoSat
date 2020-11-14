@@ -1,0 +1,252 @@
+﻿@model KhaoSat.Models.Surveys
+@using KhaoSat.Utils
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="frmUpdate" class="form-horizontal">
+    <input type="hidden" id="txtId" value="@Model.Id">
+    <div class="form-group">
+        <div class="row">
+            <label class="col-sm-2" required>Tiêu đề</label>
+            <div class="col-sm-8">
+                <input type="text" required class="form-control" id="txtTitle" value="@Model.Title">
+            </div>
+        </div>
+
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <label required class="col-sm-2">Mô tả</label>
+            <div class="col-sm-8">
+                <textarea style="height:300px" class="form-control" id="txtDescription">@Model.Description</textarea>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="row">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-4">
+                @{
+                    
+                        @if (Model.Status == 1)
+                        {
+                            <input type="checkbox" class="form-check-input" id="ckStatus" checked>
+                        }
+                        else
+                        {
+                            <input type="checkbox" class="form-check-input" id="ckStatus">
+                        }
+                    
+                    
+
+
+                }
+
+                <label class="form-check-label">Trạng thái</label>
+            </div>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-form-label col-sm-2">Thêm câu hỏi </label>
+        <a href="javascript:;" onclick="openCreateQuestion()"><i class="fas fa-plus-circle fa-2x"></i></a>
+    </div>
+    <div style="margin-top:30px">
+        <div id="survey">
+        </div>
+    </div>
+</div>
+<div></div>
+<div id="btn" style="margin-top:40px">
+    <button type="button" id="btbExit" class="btn btn-danger pull-left">Trở lại</button>
+    <button type="button" id="btnCreate" class="btn btn-primary">Lưu</button>
+</div>
+<script>
+    var frmUpdate = $('#frmUpdate');
+    var urlDomain = "/khao-sat";
+    var listQuestion = [];
+    $(document).ready(function () {
+        addRequired(frmUpdate);
+        getSurvey();
+    });
+    $('#btn').find('#btnCreate').off("click").on('click', function (e) {
+        e.preventDefault();
+        update();
+    });
+    $('#btn').find('#btbExit').off("click").on('click', function (e) {
+        e.preventDefault();
+        location.href = urlDomain + "/danh-sach";
+    });
+    function update() {
+        if (ValidateForm(frmUpdate)) {
+            return;
+        }
+        showLoading();
+        $.ajax({
+            url: urlDomain + "/create-or-update",
+            method: "POST",
+            data: {
+                Id: $("#txtId").val(),
+                Title: frmUpdate.find('#txtTitle').val(),
+                Description: frmUpdate.find('#txtDescription').val(),
+                Status: frmUpdate.find('#ckStatus').prop("checked") ? 1 : 0,
+                Questions: listQuestion
+            }
+            , success: function (response) {
+                hideLoading()
+                if (response.result) {
+
+                    showAlert(response.message, 2)
+                    location.href = urlDomain + "/danh-sach";
+
+
+                } else {
+                    showAlert(response.message)
+                    hideContentModal()
+                }
+            }
+        });
+    }
+    function openCreateQuestion() {
+        $.ajax({
+            url: urlDomain + "/CreateQuestion",
+            method: "Get",
+            success: function (response) {
+                showContentModal(response, "Tạo  mới câu hỏi")
+
+            }
+        }).then(function () {
+            $('.modal-body').scrollTop(0);
+        });
+    }
+    function openUpdateQuestion(i) {
+        $.ajax({
+            url: urlDomain + "/CreateQuestion",
+            method: "Get",
+            success: function (response) {
+                showContentModal(response, "Sửa câu hỏi")
+
+            }
+        }).then(function () {
+            $('.modal-body').scrollTop(0);
+            setDataUpdate(i);
+        });
+    }
+    function setDataUpdate(i) {
+        var question = listQuestion[i];
+        $("#boxAnswer").html(" ");
+        $("#isUpdate").val(i);
+        $("#txtDescriptionQuestion").val(question.description);
+        $('#cbType').val(question.type).change();
+        //$("#ckOther").attr("checked", question.other);
+        if (question.answers != null) {
+            $.each(question.answers, function (i, item) {
+                var text = '<div class="row form-group" id="row_' + (i + 1) + '">';
+                text += '<input class="form-control col-sm-10" type="text" value="' + item.text + '"><a onclick="deleteAnswer(' + (i + 1) + ')" style="margin:auto" href="javascript:;" class="text-right"><i class="fas fa-times"></i></a> </div>';
+                $("#boxAnswer").append(text);
+            })
+
+            stt = i;
+        }
+    }
+    //function setDataTable() {
+    //    var tableQuestionBody = $("#tableQuestionBody");
+    //    tableQuestionBody.html("");
+    //    if (listQuestion != null) {
+    //        for (var i = 0; i < listQuestion.length; i++) {
+    //            var row = "<tr>" +
+    //                '<td class="text-center">' + (i + 1) + '</td >';
+
+    //            row += '<td>' + listQuestion[i].description + ' </td>';
+    //            row += '<td>' + listQuestion[i].type + ' </td>';
+
+    //            if (listQuestion[i].other) {
+    //                row += '<input type="checkbox" checked disabled />';
+    //            } else {
+    //                row += '<input type="checkbox"  disabled />';
+    //            }
+    //            row += '<td class="text-center"><a href="javascript:;" onclick="DeleteRow(' + i + ')"><i class="fas fa-trash-alt"></i></a></td></tr>';
+    //            tableQuestionBody.append(row);
+    //        }
+    //    }
+
+    //}
+
+    function setDataSurvey() {
+        console.log(listQuestion)
+        var survey = $("#survey");
+        var stt = 1;
+        var html = "";
+        survey.html("");
+        $.each(listQuestion, function (i, item) {
+            if (item.type == 1) {
+                html = '<div class="surveyquestion clearfix card">';
+                html += '<h3><span>Câu ' + stt + '. ' + item.description + '</span></h3>';
+                html += '<div class="surveyquestion-i clearfix"><table><tbody>';
+                if (item.answers != null) {
+                    var answersNumber = 1;
+                    $.each(item.answers, function (j, answer) {
+                        html += '<tr> <td class="td-order">' + answersNumber + ' .</td>';
+                        html += '<td class="td-text"> <label>' + answer.text + '</label></td>';
+                        html += '<td class="td-input"><input class="input-checkbox" type="checkbox"></td></tr>';
+                        answersNumber++;
+                    })
+                    //if (item.other) {
+                    //    html += '<tr> <td class="td-order">' + answersNumber + ' .</td>';
+                    //    html += '<td class="td-text"><label >Ý kiến khác (xin ghi rõ):</label><div class="surveyanswer-textbox">';
+                    //    html += '<input type="text" maxlength="256" value=""></div></td >';
+                    //}
+                    html += '</table></tbody > '
+                }
+                html += '</div>'
+                html += '<div class="card-footer" style="text-align:right"><a href="javascript:;" onclick="openUpdateQuestion(' + i + ')" style="margin-right:10px"><i class="fas fa-edit"></i></a>';
+                html += '<a href="javascript:;"><i onclick="DeleteRow(' + i + ')" class="fas fa-trash-alt"></i></a></div></div>';
+            }
+            if (item.type == 2) {
+                html = '<div class="surveyquestion clearfix card">';
+                html += '<h3><span>Câu ' + stt + '. ' + item.description + '</span></h3>';
+                html += '<div class="surveyquestion-i clearfix"><table><tbody>';
+                if (item.answers != null) {
+                    var answersNumber = 1;
+                    $.each(item.answers, function (j, answer) {
+                        html += '<tr> <td class="td-order">' + answersNumber + ' .</td>';
+                        html += '<td class="td-text"> <label>' + answer.text + '</label></td>';
+                        html += '<td class="td-input"><input class="input-radio" type="radio" name="radio' + stt + '"></td></tr>';
+                        answersNumber++;
+                    })
+                    //if (item.other) {
+                    //    html += '<tr> <td class="td-order">' + answersNumber + ' .</td>';
+                    //    html += '<td class="td-text"><label >Ý kiến khác (xin ghi rõ):</label><div class="surveyanswer-textbox">';
+                    //    html += '<input type="text" maxlength="256" value=""></div></td >';
+                    //}
+                    html += '</table></tbody>'
+                }
+                html += '</div>'
+                html += '<div class="card-footer" style="text-align:right"><a href="javascript:;" onclick="openUpdateQuestion(' + i + ')" style="margin-right:10px"><i class="fas fa-edit"></i></a>';
+                html += '<a href="javascript:;"><i onclick="DeleteRow(' + i + ')" class="fas fa-trash-alt"></i></a></div></div>';
+            }
+            stt++;
+            survey.append(html);
+        })
+    }
+    function getSurvey() {
+        $.ajax({
+            url: urlDomain + "/get-by-id?id=" + $("#txtId").val(),
+            method: "Get",
+            success: function (response) {
+                console.log(response.data.questions)
+                listQuestion = response.data.questions;            }
+        }).then(function () {
+            setDataSurvey();
+        });
+    }
+    function DeleteRow(i) {
+        listQuestion.splice(i, 1);
+        setDataSurvey();
+        console.log(listQuestion)
+    }
+</script>
+
+
+
+

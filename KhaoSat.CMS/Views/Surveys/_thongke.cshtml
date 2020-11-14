@@ -1,0 +1,55 @@
+﻿@model KhaoSat.Models.Surveys
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+
+@{ var stt = 1;}
+@foreach (var item in Model.Questions)
+{
+    
+
+    <div class="surveyquestion clearfix card">
+        <input type="hidden" class="txtIdQuestion" value="@item.Id" />
+        <h3>
+            @{ var title = "Câu " + @stt + " ." + @item.Description;}
+            @{stt++;
+            }
+            <span>@title</span>
+        </h3>
+        <div class="surveyquestion-i clearfix">
+            <table style="width:100%;height:100%;" id="tblDisplay" class=" table table-bordered table-hover table-striped">
+                <tbody>
+                    <tr>
+                        <th style="width:5%;text-align:center">STT</th>
+                        <th style="width:80%;text-align:center">Câu hỏi</th>
+                        <th style="width:15%;text-align:center">Tỉ lệ chọn</th>
+                    </tr>
+                    @{ var sttAns = 1;}
+                    @foreach (var ans in item.Answers)
+                    {
+
+                        <tr>
+                            <td style="width:5%" class="td-order">@sttAns .</td>
+                            @{sttAns++;
+                            }
+
+                            <td style="width:80%" class="td-text">
+                                <label>@ans.Text</label>
+                            </td>
+                            <td style="width:15%" class="td-input">@ans.TiLeChon %</td>
+                        </tr>
+
+                    }
+
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+
+}

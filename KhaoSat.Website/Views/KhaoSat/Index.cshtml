@@ -1,0 +1,230 @@
+﻿@model KhaoSat.Models.Surveys
+@using KhaoSat.Utils
+@{
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb text-sm-center">
+        <li class="breadcrumb-item active" aria-current="page">Khảo sát: @Model.Title</li>
+    </ol>
+</nav>
+<input type="hidden" value="@Model.Id" id="txtIdSurvey" />
+<div class="content">
+    <div id="frmQuestion">
+        @{ var stt = 1;}
+        @foreach (var item in Model.Questions)
+        {
+            if (item.Type == (byte)TypeQuestionEnum.MultipleChoice)
+            {
+
+                <div class="surveyquestion clearfix card">
+                    <input type="hidden" class="txtIdQuestion" value="@item.Id" />
+                    <h3>
+                        @{ var title = "Câu " + @stt + " ." + @item.Description;}
+                        @{stt++;
+                        }
+                        <span>@title</span>
+                    </h3><div class="surveyquestion-i clearfix">
+                        <table>
+                            <tbody>
+                                @{ var sttAns = 1;}
+                                @foreach (var ans in item.Answers)
+                                {
+
+                                    <tr>
+                                        <td style="width:5%" class="td-order">@sttAns .</td>
+                                        @{sttAns++;
+                                        }
+
+                                        <td style="width:90%" class="td-text">
+                                            <label>@ans.Text</label>
+                                        </td>
+                                        <td style="width:5%" class="td-input"><input value="@ans.Id" class="input-checkbox" type="checkbox"></td>
+                                    </tr>
+
+                                }
+
+                              
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            }
+            if (item.Type == (byte)TypeQuestionEnum.SingleChoice)
+            {
+
+                <div class="surveyquestion clearfix card">
+                    <input type="hidden" class="txtIdQuestion" value="@item.Id" />
+                    <h3>
+                        @{ var title = "Câu " + @stt + " ." + @item.Description;}
+                        @{stt++;
+                        }
+                        <span>@title</span>
+                    </h3><div class="surveyquestion-i clearfix">
+                        <table>
+                            <tbody>
+                                @{ var sttAns = 1;}
+                                @foreach (var ans in item.Answers)
+                                {
+
+
+                                    <tr class="answers d-flex ">
+
+                                        <td style="width:5%" class="td-order">@sttAns .</td>
+                                        @{sttAns++;
+                                        }
+
+                                        <td style="width:90%" class="td-text">
+                                            <label>@ans.Text</label>
+                                        </td>
+                                        <td style="width:5%" class="td-input"><input class="input-checkbox" value="@ans.Id" type="radio" name="rd"></td>
+                                    </tr>
+
+                                }
+
+                               
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            }
+        }
+    </div>
+    <div class="participantform clearfix">
+        <div class="survey-title clearfix">
+            <span>THÔNG TIN NGƯỜI THAM GIA</span>
+        </div>
+        <div class="survey-notes clearfix">
+            Thông tin có đánh dấu * là bạn bắt buộc phải nhập<br>
+
+        </div>
+
+        <div class="form-field">
+            <label class="form-label col-sm-3">Họ và tên:<abbr>*</abbr></label>
+            <div class="col-sm-9">
+                <input name="ucSurveyForm$txtFullname" type="text" maxlength="256" id="ucSurveyForm_txtFullname" class="survey-formcontrol">
+
+            </div>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label col-sm-3">Tuổi:<abbr>*</abbr></label>
+            <div class="col-sm-9">
+                <input type="number" maxlength="3" id="ucSurveyForm_txtAge" class="survey-formcontrol w-150px">
+            </div>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label col-sm-3">Giới tính:<abbr>*</abbr></label>
+            <div class="col-sm-9">
+                <select name="ucSurveyForm$ddlGender" id="ucSurveyForm_ddlGender" class="survey-formcontrol w-150px">
+                    <option value="1">Nam</option>
+                    <option value="0">Nữ</option>
+
+                </select>
+                <span id="ucSurveyForm_rfvGender" class="survey-error" style="display:none;">Bạn phải chọn giới tính</span>
+            </div>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label col-sm-3">Nghề nghiệp:<abbr>*</abbr></label>
+            <div class="col-sm-9">
+                <input type="text" id="txtJob" class="survey-formcontrol" />
+                <span id="ucSurveyForm_rfvOccupation" class="survey-error" style="display:none;">Bạn phải chọn nghề nghiệp</span>
+            </div>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label col-sm-3">Nơi sống:<abbr>*</abbr></label>
+            <div class="col-sm-9">
+                <input type="text" id="txtPlace" class="survey-formcontrol" />
+                <span id="ucSurveyForm_rfvPlace" class="survey-error" style="display:none;">Bạn phải chọn nơi sống</span>
+            </div>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label col-sm-3">Email:</label>
+            <div class="col-sm-9">
+                <input name="ucSurveyForm$txtEmail" type="text" maxlength="256" id="txtEmai" class="survey-formcontrol">
+                <span id="ucSurveyForm_revEmail" class="survey-error" style="display:none;">Bạn nhập sai email</span>
+            </div>
+        </div>
+        <div class="form-field">
+            <button onclick="traLoi()" class="btn btn-primary" type="button">Đồng ý</button>
+        </div>
+    </div>
+</div>
+<script>
+
+    var frmQuestion = $("#frmQuestion");
+    function traLoi() {
+        var ListAns = [];
+        frmQuestion.find("input").each(function () {
+            if (this.checked) {
+                var ans = {
+                    QuestionId: $(this).closest(".surveyquestion").find(".txtIdQuestion").val(),
+                    AnswerId: $(this).val()
+                }
+                ListAns.push(ans)
+            }
+        })
+        var check = false;
+        $(".surveyquestion").each(function () {
+            var inputcheck = false
+            $(this).find("input").each(function () {
+                if (this.checked) {
+                    inputcheck = true;
+                }
+            })
+
+            if (inputcheck == false) {
+                check = true;
+            }
+
+        })
+        console.log(check);
+        if (check == true) {
+            showAlert("Bạn chưa trả lời hết câu hỏi khảo sát");
+            $("html, body").animate({ scrollTop: 0 }, 1000);
+            return;
+        }
+        $.ajax({
+            url: "/khaosat/CreateUserSureys",
+            method: "POST",
+            data: {
+
+                FullName: $("#ucSurveyForm_txtFullname").val(),
+                Sex: $("#ucSurveyForm_ddlGender").val(),
+                Job: $("#txtJob").val(),
+                Place: $("#txtPlace").val(),
+                Emai: $("#txtEmai").val(),
+                ListAnswers: ListAns,
+                Surveys: {
+                    Id: $("#txtIdSurvey").val()
+                }
+            },
+            success: function (response) {
+
+                if (response.result) {
+                    alert("Cảm ơn bạn đã tham gia khảo sát");
+                    location.href = "/khaosat/index";
+                } else {
+
+                }
+            }
+        });
+    }
+    function showAlert(message, error = 1) {
+        if (error === 1) {
+            toastr.error(message)
+        }
+        else if (error === 2) {
+            toastr.success(message)
+        }
+        //removeAlert();
+    }
+</script>
