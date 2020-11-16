@@ -16,6 +16,7 @@ namespace KhaoSat.Models
         public long QuestionId { get; set; }
         [Column("Text")]
         public string Text { get; set; }
+        public bool? RightAnswer { get; set; }
         [NotMapped]
         public double TiLeChon { get; set; }
     }

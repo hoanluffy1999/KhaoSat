@@ -146,5 +146,6 @@ namespace KhaoSat.CMS.Controllers
                 return Json(new { Result = false, Message = ex.Message });
             }
         }
+       
     }
 }
